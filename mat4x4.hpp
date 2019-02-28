@@ -2,19 +2,20 @@
 #define MAT4X4_HPP_INCLUDED
 
 #include <math.h>
-#include "vec3.hpp"
+#include "vector3.hpp"
+#include "point3.hpp"
 
 using namespace std;
 
-class mat4x4 {
+class mat4x4{
 	public:
 		float data[16];
 
 		mat4x4(){}
-		mat4x4(const float& m00, const float& m01, const float& m02, const float& m03,
-			   const float& m10, const float& m11, const float& m12, const float& m13,
-			   const float& m20, const float& m21, const float& m22, const float& m23,
-			   const float& m30, const float& m31, const float& m32, const float& m33){
+		mat4x4(float m00, float m01, float m02, float m03,
+			   float m10, float m11, float m12, float m13,
+			   float m20, float m21, float m22, float m23,
+			   float m30, float m31, float m32, float m33){
 			this->data[0]  = m00; this->data[1]  = m01; this->data[2]  = m02; this->data[3]  = m03;
 			this->data[4]  = m10; this->data[5]  = m11; this->data[6]  = m12; this->data[7]  = m13;
 			this->data[8]  = m20; this->data[9]  = m21; this->data[10] = m22; this->data[11] = m23;
@@ -54,10 +55,16 @@ class mat4x4 {
 			return mat4x4(temp);
 		}
 
-		vec3 operator*(vec3 vector){
-			return vec3(vector.x*this->data[0] + vector.y*this->data[1] + vector.z*this->data[2],
-						vector.x*this->data[4] + vector.y*this->data[5] + vector.z*this->data[6],
-						vector.x*this->data[8] + vector.y*this->data[9] + vector.z*this->data[10]);
+		vector3_t operator*(vector3_t vector){
+			return vector3_t(vector.x*this->data[0] + vector.y*this->data[1] + vector.z*this->data[2],
+							 vector.x*this->data[4] + vector.y*this->data[5] + vector.z*this->data[6],
+							 vector.x*this->data[8] + vector.y*this->data[9] + vector.z*this->data[10]);
+		}
+
+		point3_t operator*(point3_t point){
+			return point3_t(point.x*this->data[0] + point.y*this->data[1] + point.z*this->data[2]  + this->data[3],
+							point.x*this->data[4] + point.y*this->data[5] + point.z*this->data[6]  + this->data[7],
+							point.x*this->data[8] + point.y*this->data[9] + point.z*this->data[10] + this->data[11]);
 		}
 
 		mat4x4 operator*(float scalar) {
@@ -126,7 +133,7 @@ class mat4x4 {
 			}
 		}
 
-		static mat4x4 createLookAtMatrix(vec3 right, vec3 up, vec3 forward, vec3 position){
+		static mat4x4 createLookAtMatrix(vector3_t right, vector3_t up, vector3_t forward, point3_t position){
 			return mat4x4(right.x, up.x, forward.x, position.x,
 						  right.y, up.y, forward.y, position.y,
 						  right.z, up.z, forward.z, position.z,

@@ -1,24 +1,63 @@
 #include <iostream>
+#include <vector>
+#include <ctime>
 
-#include "vec3.hpp"
+#include "vector3.hpp"
+#include "point3.hpp"
 #include "mat4x4.hpp"
+#include "ray.hpp"
+#include "colour.hpp"
+#include "material.hpp"
+#include "scene.hpp"
+#include "primitive.hpp"
+#include "sphere.hpp"
+#include "bitmap/bitmap_image.hpp"
 
 using namespace std;
 
-int main(){
-    vec3 v(0, 1, 1);
+int main(int argc, char** argv){
+    point3_t camera_position(0.0f, 0.0f, 5.0f);
+    vector3_t forward(0.0f, 0.0f, 1.0f);
+    vector3_t up(0.0f, 1.0f, 0.0f);
+    vector3_t right(1.0f, 0.0f, 0.0f);
+    mat4x4 look_at = mat4x4::createLookAtMatrix(right, up, forward, camera_position);
+    
+    material_t basic_material(colour_t(0.3f, 0.2f, 0.1f), colour_t(0.3f, 0.3f, 0.3f), 0.7);
 
-    cout << v.norm2() << endl;
+    vector<primitive_t*> actors;
+    actors.push_back(new sphere_t(basic_material, point3_t(0.0f, 0.0f, 0.0f), 1.0f));
 
-    vec3 w = v*2;
+    int width  = 500;
+    int height = 500;
+    float ratio = 1.0f;
+    float fov = 45.0f;
+    bitmap_image image(width, height);
 
-    cout << w.norm2() << endl;
+    ray_t image_ray, scene_ray;
 
-    mat4x4 M = mat4x4::createTranslationMatrix(2.0, 3.0, 4.0);
+    colour_t pixel_color;
 
-    vec3 z = M*w;
+    scene_t scene(colour_t(0.5f, 0.5f, 0.5f), actors, 3);
 
-    cout << z.norm() << endl;
+    time_t start = clock();
+
+    for(int i = 0; i < height; i++){
+        for(int j = 0; j < width; j++){
+            image_ray = ray_t::createSceneRay(i, j, width, height, ratio, fov);
+
+            scene_ray.origin = look_at * image_ray.origin;
+            scene_ray.direction = look_at * image_ray.direction;
+            
+            pixel_color = scene.trace(scene_ray, 0);
+            
+            image.set_pixel(j, i, pixel_color.get_rgb());
+        }
+    }
+
+    time_t finish = clock();
+    cout << (finish-start)/(double)(CLOCKS_PER_SEC) << endl;
+
+    image.save_image("image.bmp");
 
     return 0;
 }

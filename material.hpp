@@ -5,12 +5,12 @@
 
 class material_t{
     public:
-        colour kd;
-        colour ks;
+        colour_t kd;
+        colour_t ks;
         float sh;
 
         material_t(){}
-        material_t(colour kd, colour ks, float sh){
+        material_t(colour_t kd, colour_t ks, float sh){
             this->kd = kd;
             this->ks = ks;
             this->sh = sh;

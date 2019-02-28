@@ -3,7 +3,8 @@
 
 #include <math.h>
 
-const float EPS = 1e-6;
+#include "utils.hpp"
+#include "bitmap/bitmap_image.hpp"
 
 using namespace std;
 
@@ -12,7 +13,7 @@ class colour_t{
 		float r, g, b;
 
 		colour_t(){}
-		constexpr colour_t(const float& x, const float& y, const float& z){
+		colour_t(float r, float g, float b){
 			this->r = r;
 			this->g = g;
 			this->b = b;
@@ -23,7 +24,7 @@ class colour_t{
 			return colour_t(this->r + color.r, this->g + color.g, this->b + color.b);
 		}
 
-		colour_t operator-(colour_t vector){
+		colour_t operator-(colour_t color){
 			return colour_t(this->r - color.r, this->g - color.g, this->b - color.b);
 		}
 
@@ -31,7 +32,7 @@ class colour_t{
 			return colour_t(this->r * scalar, this->g * scalar, this->b * scalar);
 		}
 
-		bool operator==(colour_t vector){
+		bool operator==(colour_t color){
 			return fabsf(this->r - color.r) < EPS && fabsf(this->g - color.g) < EPS && fabsf(this->b - color.b) < EPS;
 		}
 
@@ -41,7 +42,7 @@ class colour_t{
 			this->b += color.b;
 		}
 
-		void operator-=(colour_t vector){
+		void operator-=(colour_t color){
 			this->r -= color.r;
 			this->g -= color.g;
 			this->b -= color.b;
@@ -51,6 +52,24 @@ class colour_t{
 			this->r *= scalar;
 			this->g *= scalar;
 			this->b *= scalar;
+		}
+
+		int getRGB(){
+			int R = (int)(255.0f * fminf(1.0f, fmaxf(0.0f, r)));
+			int G = (int)(255.0f * fminf(1.0f, fmaxf(0.0f, g)));
+			int B = (int)(255.0f * fminf(1.0f, fmaxf(0.0f, b)));
+
+			return ( (R<<16) | (G<<8) | B );
+		}
+
+		rgb_t get_rgb(){
+			rgb_t rgb;
+
+			rgb.red = (unsigned char)(255.0f * fminf(1.0f, fmaxf(0.0f, r)));
+			rgb.green = (unsigned char)(255.0f * fminf(1.0f, fmaxf(0.0f, g)));
+			rgb.blue = (unsigned char)(255.0f * fminf(1.0f, fmaxf(0.0f, b)));
+
+			return rgb;
 		}
 };
 
